@@ -13,7 +13,7 @@ import React from 'react'
 import styleConstructor from './style'
 
 import DayView from './DayView'
-
+const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 export default class EventCalendar extends React.Component {
   constructor(props) {
     super(props)
@@ -70,7 +70,10 @@ export default class EventCalendar extends React.Component {
     }
     const date = moment(this.props.initDate).add(index - this.props.size, 'days')
     this.refs.calendar.scrollToIndex({ index, animated: false })
-    this.setState({ index, date })
+
+    this.setState({ index, date }, () => {
+      this.props.updateDate(date);
+    })
   }
 
   render() {
@@ -87,7 +90,7 @@ export default class EventCalendar extends React.Component {
           <TouchableOpacity onPress={() => this._goToPage(this.state.index - 1)}>
             <Image source={require('./back.png')} style={this.styles.arrow} />
           </TouchableOpacity>
-          <Text style={this.styles.headerText}>{this.state.date.format(formatHeader || 'DD MMMM YYYY')}</Text>
+          <Text style={this.styles.headerText}>{days[moment(this.state.date).day()]}, {this.state.date.format('DD MMM YYYY')}</Text>
           <TouchableOpacity onPress={() => this._goToPage(this.state.index + 1)}>
             <Image source={require('./forward.png')} style={this.styles.arrow} />
           </TouchableOpacity>
@@ -109,7 +112,9 @@ export default class EventCalendar extends React.Component {
           onMomentumScrollEnd={(event) => {
             const index = parseInt(event.nativeEvent.contentOffset.x / width)
             const date = moment(this.props.initDate).add(index - this.props.size, 'days')
-            this.setState({ index, date })
+            this.setState({ index, date }, () => {
+              this.props.updateDate(date);
+            })
           }}
           {...virtualizedListProps}
         />
